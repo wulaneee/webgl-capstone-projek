@@ -19,6 +19,7 @@ export default function Home() {
   const [webglLoading, setWebglLoading] = useState(false)
   const [webglError, setWebglError] = useState('')
   const [imageCount, setImageCount] = useState(0)
+  const rendererRef = useRef<any>(null)
 
   // Auto-detect images saat halaman dibuka
   useEffect(() => {
@@ -91,14 +92,29 @@ export default function Home() {
   }
 
   const closeViewer = () => {
+    // Cleanup renderer
+    if (rendererRef.current && rendererRef.current.dispose) {
+      rendererRef.current.dispose()
+    }
+    
     setShowViewer(false)
     setWebglLoading(false)
     setWebglError('')
   }
 
   const initWebGL = async () => {
+    // CEK APAKAH SCRIPT SUDAH DI-LOAD SEBELUMNYA
+    const scriptsAlreadyLoaded = typeof (window as any).Renderer !== 'undefined'
+    
     const loadScripts = async () => {
       try {
+        // Jika script sudah di-load, skip loading
+        if (scriptsAlreadyLoaded) {
+          console.log('Scripts already loaded, skipping...')
+          await initializeWebGL()
+          return
+        }
+
         console.log('Loading WebGL scripts...')
         
         const scripts = [
@@ -113,6 +129,14 @@ export default function Home() {
         ]
 
         for (const src of scripts) {
+          // CEK apakah script dengan src ini sudah ada
+          const existingScript = document.querySelector(`script[src="${src}"]`)
+          
+          if (existingScript) {
+            console.log(`Script already exists: ${src}`)
+            continue
+          }
+
           await new Promise((resolve, reject) => {
             const script = document.createElement('script')
             script.src = src
@@ -148,6 +172,7 @@ export default function Home() {
         }
 
         const renderer = new (window as any).Renderer(canvas)
+        rendererRef.current = renderer
         
         console.log('Loading textures...')
         const texturesLoaded = await renderer.loadTextures()
@@ -174,13 +199,6 @@ export default function Home() {
         }
 
         window.addEventListener('resize', handleResize)
-
-        return () => {
-          window.removeEventListener('resize', handleResize)
-          if (renderer && renderer.dispose) {
-            renderer.dispose()
-          }
-        }
         
       } catch (err) {
         console.error('Failed to start WebGL:', err)
