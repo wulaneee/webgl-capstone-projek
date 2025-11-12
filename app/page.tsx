@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Session } from '@/lib/types'
+import Image from 'next/image'
 
 export default function Home() {
   const [sessions, setSessions] = useState<Session[]>([])
@@ -41,9 +42,25 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">WebGL Panorama Stitcher</h1>
+            <div className="flex items-center gap-4 mb-3">
+              <div className="bg-white p-3 rounded-xl">
+                <Image
+                  src="/logo.png"
+                  alt="Relieva Logo"
+                  width={60}
+                  height={60}
+                />
+              </div>
+              <h1 className="text-5xl font-bold tracking-tight">RELIEVA</h1>
+              <span className="text-xs font-semibold bg-blue-600 px-4 py-1.5 rounded-full">
+                Relief Evaluation System
+              </span>
+            </div>
+            <h2 className="text-2xl text-gray-300 mb-2 font-medium">
+              Sistem Deteksi Penggaraman pada Relief Candi Borobudur
+            </h2>
             <p className="text-gray-400">
-              Select a session to view images, process stitching, and explore in 3D
+              Pilih sesi untuk melihat hasil pindai, proses stitching, dan eksplorasi 3D
             </p>
           </div>
 
@@ -51,24 +68,24 @@ export default function Home() {
           <div className="bg-gray-800 rounded-lg p-6 mb-8">
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-xl font-semibold mb-1">Available Sessions</h2>
+                <h2 className="text-xl font-bold text-white mb-1">Sesi Tersedia</h2>
                 <p className="text-gray-400 text-sm">
-                  Sessions detected in <code className="bg-gray-700 px-2 py-1 rounded">public/source/</code>
+                  Sesi terdeteksi di <code className="bg-gray-700 text-gray-300 px-2 py-1 rounded font-mono text-xs">public/source/</code>
                 </p>
               </div>
               <div className="flex gap-3">
                 <Link
                   href="/azure"
-                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors"
+                  className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg font-semibold transition-colors"
                 >
-                  ☁️ Download from Azure
+                  ☁️ Unduh dari Azure
                 </Link>
                 <button
                   onClick={fetchSessions}
                   disabled={loading}
-                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg font-semibold transition-colors"
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:text-gray-400 text-white rounded-lg font-semibold transition-colors"
                 >
-                  {loading ? 'Loading...' : 'Refresh Sessions'}
+                  {loading ? 'Memuat...' : 'Muat Ulang Sesi'}
                 </button>
               </div>
             </div>
@@ -77,13 +94,13 @@ export default function Home() {
             {loading && (
               <div className="mt-4 text-blue-400 flex items-center gap-2">
                 <div className="animate-spin h-5 w-5 border-2 border-blue-400 border-t-transparent rounded-full"></div>
-                Scanning for sessions...
+                Memindai sesi...
               </div>
             )}
 
             {/* Error Status */}
             {error && (
-              <div className="mt-4 text-red-400 bg-red-900/20 p-3 rounded">
+              <div className="mt-4 text-red-400 bg-red-900/20 border border-red-600 p-3 rounded-lg">
                 Error: {error}
               </div>
             )}
@@ -91,15 +108,15 @@ export default function Home() {
 
           {/* Sessions Grid */}
           {!loading && sessions.length === 0 && (
-            <div className="bg-gray-800 rounded-lg p-12 text-center">
+            <div className="bg-gray-800 rounded-lg p-12 text-center border border-gray-700">
               <div className="text-6xl mb-4">📁</div>
-              <h3 className="text-2xl font-bold mb-2">No Sessions Found</h3>
+              <h3 className="text-2xl font-bold text-white mb-2">Tidak Ada Sesi Ditemukan</h3>
               <p className="text-gray-400 mb-6">
-                Add session folders to <code className="bg-gray-700 px-2 py-1 rounded">public/source/</code>
+                Tambahkan folder sesi ke <code className="bg-gray-700 text-gray-300 px-2 py-1 rounded font-mono text-xs">public/source/</code>
               </p>
-              <div className="bg-gray-900 rounded p-4 text-left max-w-md mx-auto">
-                <p className="text-sm text-gray-400 mb-2">Expected structure:</p>
-                <pre className="text-xs text-green-400">
+              <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 text-left max-w-md mx-auto">
+                <p className="text-sm text-gray-400 mb-2">Struktur yang diharapkan:</p>
+                <pre className="text-xs text-blue-400">
 {`public/source/
   └── session_01/
       ├── images/
@@ -121,7 +138,7 @@ export default function Home() {
                 <Link
                   key={session.id}
                   href={`/session/${session.id}`}
-                  className="block bg-gray-800 hover:bg-gray-750 rounded-lg overflow-hidden transition-all hover:shadow-xl hover:scale-105"
+                  className="block bg-gray-800 rounded-lg overflow-hidden border border-gray-700 hover:border-gray-600 transition-all hover:-translate-y-1"
                 >
                   <div className="p-6">
                     {/* Session Name */}
@@ -130,41 +147,41 @@ export default function Home() {
                         {session.name}
                       </h3>
                       {session.status.hasOutput ? (
-                        <span className="bg-green-600 text-white text-xs px-2 py-1 rounded-full font-semibold">
-                          Processed
+                        <span className="bg-green-600 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                          Terproses
                         </span>
                       ) : (
-                        <span className="bg-yellow-600 text-white text-xs px-2 py-1 rounded-full font-semibold">
-                          Unprocessed
+                        <span className="bg-yellow-600 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                          Belum Diproses
                         </span>
                       )}
                     </div>
 
                     {/* Session Stats */}
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between text-gray-300">
+                      <div className="flex justify-between text-gray-400">
                         <span>Images:</span>
                         <span className="font-semibold text-white">
                           {session.imageCount}
                         </span>
                       </div>
-                      <div className="flex justify-between text-gray-300">
-                        <span>Groups:</span>
+                      <div className="flex justify-between text-gray-400">
+                        <span>Grup:</span>
                         <span className="font-semibold text-white">
                           {session.groups.length}
                         </span>
                       </div>
                       {session.status.hasOutput && (
                         <>
-                          <div className="flex justify-between text-gray-300">
-                            <span>Original Stitched:</span>
-                            <span className="font-semibold text-green-400">
+                          <div className="flex justify-between text-gray-400">
+                            <span>Stitched Original:</span>
+                            <span className="font-semibold text-blue-400">
                               {session.status.stitchedCount || 0}
                             </span>
                           </div>
-                          <div className="flex justify-between text-gray-300">
-                            <span>Segmented Stitched:</span>
-                            <span className="font-semibold text-green-400">
+                          <div className="flex justify-between text-gray-400">
+                            <span>Stitched Segmentasi:</span>
+                            <span className="font-semibold text-blue-400">
                               {session.status.stitchedSegmentationCount || 0}
                             </span>
                           </div>
@@ -173,8 +190,8 @@ export default function Home() {
                     </div>
 
                     {/* Action Hint */}
-                    <div className="mt-4 pt-4 border-t border-gray-700 text-sm text-gray-400">
-                      Click to {session.status.hasOutput ? 'view results' : 'process session'} →
+                    <div className="mt-4 pt-4 border-t border-gray-700 text-sm text-gray-400 hover:text-blue-400 transition-colors">
+                      Klik untuk {session.status.hasOutput ? 'lihat hasil' : 'proses sesi'} →
                     </div>
                   </div>
                 </Link>
@@ -185,15 +202,15 @@ export default function Home() {
           {/* Footer Info */}
           {sessions.length > 0 && (
             <div className="mt-8 text-center text-gray-400 text-sm">
-              Total: <span className="text-white font-semibold">{sessions.length}</span> session(s) •{' '}
-              <span className="text-green-400 font-semibold">
+              Total: <span className="text-white font-semibold">{sessions.length}</span> sesi •{' '}
+              <span className="text-green-500 font-semibold">
                 {sessions.filter((s) => s.status.hasOutput).length}
               </span>{' '}
-              processed •{' '}
-              <span className="text-yellow-400 font-semibold">
+              terproses •{' '}
+              <span className="text-yellow-500 font-semibold">
                 {sessions.filter((s) => !s.status.hasOutput).length}
               </span>{' '}
-              unprocessed
+              belum diproses
             </div>
           )}
         </div>

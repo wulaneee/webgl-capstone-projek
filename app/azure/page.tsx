@@ -152,7 +152,7 @@ export default function AzureSessionsPage() {
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading sessions from database...</p>
+          <p className="text-gray-400">Memuat sesi dari database...</p>
         </div>
       </div>
     );
@@ -181,16 +181,16 @@ export default function AzureSessionsPage() {
       <header className="bg-gray-800 border-b border-gray-700 p-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Azure Sessions</h1>
+            <h1 className="text-3xl font-bold mb-2">Sesi Azure</h1>
             <p className="text-gray-400">
-              Download sessions from Azure Storage to local
+              Unduh sesi dari Azure Storage ke lokal
             </p>
           </div>
           <Link
             href="/"
             className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded transition"
           >
-            ← Back to Home
+            ← Kembali
           </Link>
         </div>
       </header>
@@ -200,7 +200,7 @@ export default function AzureSessionsPage() {
         {sessions.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-400 text-lg">
-              No completed sessions found in database
+              Tidak ada sesi yang ditemukan di database
             </p>
           </div>
         ) : (
@@ -212,7 +212,7 @@ export default function AzureSessionsPage() {
                   selectedSession === session.sessionId
                     ? 'border-blue-500'
                     : 'border-gray-700'
-                } p-6 hover:border-gray-600 transition cursor-pointer`}
+                } p-6 hover:border-gray-600 transition cursor-pointer flex flex-col h-[320px]`}
                 onClick={() => setSelectedSession(session.sessionId)}
               >
                 {/* Session Header */}
@@ -228,39 +228,70 @@ export default function AzureSessionsPage() {
                 {/* Metadata */}
                 <div className="space-y-2 text-sm text-gray-400 mb-4">
                   <p>
-                    <span className="font-medium">Completed:</span>{' '}
-                    {new Date(session.completedAt).toLocaleString()}
+                    <span className="font-medium">Selesai:</span>{' '}
+                    {new Date(session.completedAt).toLocaleString('id-ID')}
                   </p>
                   <p>
-                    <span className="font-medium">Created:</span>{' '}
-                    {new Date(session.createdAt).toLocaleString()}
+                    <span className="font-medium">Dibuat:</span>{' '}
+                    {new Date(session.createdAt).toLocaleString('id-ID')}
                   </p>
                 </div>
 
-                {/* Azure Status */}
-                {session.azureStatus && (
-                  <div className="bg-gray-900 rounded p-3 mb-4 text-sm">
-                    <p className="font-medium mb-2">Azure Status:</p>
-                    <div className="space-y-1 text-gray-400">
-                      <p>Images: {session.azureStatus.image_count}</p>
-                      <p>Metadata: {session.azureStatus.metadata_count}</p>
-                      <p>
-                        Consistent:{' '}
-                        {session.azureStatus.is_consistent ? '✅' : '❌'}
-                      </p>
-                      {!session.azureStatus.is_consistent && (
-                        <p className="text-red-400 text-xs mt-1">
-                          Missing: {session.azureStatus.missing_images.length}{' '}
-                          images, {session.azureStatus.missing_metadata.length}{' '}
-                          metadata
-                        </p>
+                {/* Azure Status - Always show space */}
+                <div className="bg-gray-900 rounded p-3 mb-4 text-sm flex-grow">
+                  {session.azureStatus ? (
+                    <>
+                      <p className="font-medium mb-2">Status Azure:</p>
+                      <div className="grid grid-cols-2 gap-2 text-gray-400 text-xs">
+                        <div>
+                          <span className="text-gray-500">Images:</span>{' '}
+                          <span className="font-semibold text-white">
+                            {session.azureStatus.image_count}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Metadata:</span>{' '}
+                          <span className="font-semibold text-white">
+                            {session.azureStatus.metadata_count}
+                          </span>
+                        </div>
+                        <div className="col-span-2">
+                          <span className="text-gray-500">Konsisten:</span>{' '}
+                          {session.azureStatus.is_consistent ? (
+                            <span className="text-green-400 font-semibold">
+                              ✅ Ya
+                            </span>
+                          ) : (
+                            <span className="text-red-400 font-semibold">
+                              ❌ Tidak
+                            </span>
+                          )}
+                        </div>
+                        {!session.azureStatus.is_consistent && (
+                          <div className="col-span-2 text-red-400 text-xs mt-1">
+                            Hilang: {session.azureStatus.missing_images.length}{' '}
+                            images, {session.azureStatus.missing_metadata.length}{' '}
+                            metadata
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      {session.loadingStatus ? (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin h-4 w-4 border-2 border-gray-500 border-t-transparent rounded-full"></div>
+                          <span>Memuat...</span>
+                        </div>
+                      ) : (
+                        <span>Klik "Lihat Detail" untuk info lebih lanjut</span>
                       )}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 mt-auto">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -269,7 +300,7 @@ export default function AzureSessionsPage() {
                     disabled={session.loadingStatus}
                     className="flex-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 px-3 py-2 rounded text-sm transition"
                   >
-                    {session.loadingStatus ? 'Loading...' : 'View Details'}
+                    {session.loadingStatus ? 'Memuat...' : 'Lihat Detail'}
                   </button>
                   <button
                     onClick={(e) => {
@@ -280,8 +311,8 @@ export default function AzureSessionsPage() {
                     className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:text-gray-400 px-3 py-2 rounded text-sm font-medium transition"
                   >
                     {downloading === session.sessionId
-                      ? 'Downloading...'
-                      : 'Download'}
+                      ? 'Mengunduh...'
+                      : 'Unduh'}
                   </button>
                 </div>
               </div>
@@ -294,23 +325,23 @@ export default function AzureSessionsPage() {
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gray-800 rounded-lg p-6 max-w-md border border-gray-700">
-            <h3 className="text-xl font-bold mb-4">Session Already Exists</h3>
+            <h3 className="text-xl font-bold mb-4">Sesi Sudah Ada</h3>
             <p className="text-gray-400 mb-6">
-              Session <span className="text-blue-400">{confirmSessionId}</span>{' '}
-              already exists locally. Do you want to overwrite it?
+              Sesi <span className="text-blue-400">{confirmSessionId}</span>{' '}
+              sudah ada di lokal. Apakah Anda ingin menimpanya?
             </p>
             <div className="flex gap-3">
               <button
                 onClick={handleCancelOverwrite}
                 className="flex-1 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded transition"
               >
-                Cancel
+                Batal
               </button>
               <button
                 onClick={handleConfirmOverwrite}
                 className="flex-1 bg-red-600 hover:bg-red-700 px-4 py-2 rounded transition"
               >
-                Overwrite
+                Timpa
               </button>
             </div>
           </div>

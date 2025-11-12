@@ -105,13 +105,13 @@ export default function SessionDetailPage() {
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold mb-2">Session Not Found</h2>
+          <h2 className="text-2xl font-bold mb-2">Sesi Tidak Ditemukan</h2>
           <p className="text-gray-400 mb-6">{error}</p>
           <Link
             href="/"
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold inline-block"
           >
-            Back to Home
+            Kembali ke Beranda
           </Link>
         </div>
       </div>
@@ -128,22 +128,22 @@ export default function SessionDetailPage() {
               href="/"
               className="text-blue-400 hover:text-blue-300 mb-4 inline-flex items-center gap-2"
             >
-              ← Back to Sessions
+              ← Kembali ke Daftar Sesi
             </Link>
             <div className="flex items-start justify-between mt-4">
               <div>
                 <h1 className="text-4xl font-bold mb-2">{session.name}</h1>
                 <p className="text-gray-400">
-                  {session.imageCount} images • {session.groups.length} groups
+                  {session.imageCount} images • {session.groups.length} grup
                 </p>
               </div>
               {session.status.hasOutput ? (
                 <span className="bg-green-600 text-white px-4 py-2 rounded-full font-semibold">
-                  ✓ Processed
+                  ✓ Terproses
                 </span>
               ) : (
                 <span className="bg-yellow-600 text-white px-4 py-2 rounded-full font-semibold">
-                  ⏳ Unprocessed
+                  ⏳ Belum Diproses
                 </span>
               )}
             </div>
@@ -151,7 +151,7 @@ export default function SessionDetailPage() {
 
           {/* Processing Section */}
           <div className="bg-gray-800 rounded-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold mb-4">Stitching Process</h2>
+            <h2 className="text-2xl font-bold mb-4">Proses Stitching</h2>
 
             <div className="flex items-center gap-4">
               <button
@@ -159,12 +159,12 @@ export default function SessionDetailPage() {
                 disabled={session.status.hasOutput || stitching}
                 className="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors"
               >
-                {stitching ? 'Processing...' : 'Process Stitching'}
+                {stitching ? 'Memproses...' : 'Proses Stitching'}
               </button>
 
               {session.status.hasOutput && (
                 <span className="text-gray-400 text-sm">
-                  Already processed. Delete output folder to reprocess.
+                  Sudah diproses. Hapus folder output untuk memproses ulang.
                 </span>
               )}
             </div>
@@ -189,13 +189,13 @@ export default function SessionDetailPage() {
 
           {/* Images Gallery */}
           <div className="bg-gray-800 rounded-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold mb-4">Source Images</h2>
+            <h2 className="text-2xl font-bold mb-4">Images Sumber</h2>
 
             {/* Group by group_id */}
             {session.groups.map((group) => (
               <div key={group.group_id} className="mb-6">
                 <h3 className="text-lg font-semibold mb-3 text-blue-400">
-                  Group {group.group_id} ({group.images.length} images)
+                  Grup {group.group_id} ({group.images.length} images)
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                   {group.images.map((image) => (
@@ -233,12 +233,12 @@ export default function SessionDetailPage() {
           {/* Stitching Results */}
           {session.status.hasOutput && outputs && (
             <div className="bg-gray-800 rounded-lg p-6 mb-8">
-              <h2 className="text-2xl font-bold mb-6">Stitching Results</h2>
+              <h2 className="text-2xl font-bold mb-6">Hasil Stitching</h2>
 
               {/* Version Selector */}
               <div className="mb-6">
                 <label className="block text-sm font-semibold mb-2 text-gray-400">
-                  Select Version for WebGL Viewer:
+                  Pilih Versi untuk Viewer WebGL:
                 </label>
                 <div className="flex gap-4">
                   <button
@@ -249,7 +249,7 @@ export default function SessionDetailPage() {
                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
-                    Original Stitching
+                    Stitching Original
                   </button>
                   <button
                     onClick={() => setSelectedVersion('segmented')}
@@ -259,7 +259,7 @@ export default function SessionDetailPage() {
                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                     }`}
                   >
-                    Segmented Stitching
+                    Stitching Segmentasi
                   </button>
                 </div>
               </div>
@@ -270,7 +270,7 @@ export default function SessionDetailPage() {
                 {outputs.original.length > 0 && (
                   <div>
                     <h3 className="text-lg font-semibold mb-3 text-green-400">
-                      Original Version ({outputs.original.length} images)
+                      Versi Original ({outputs.original.length} images)
                     </h3>
                     <div className="space-y-4">
                       {outputs.original.map((imgPath, idx) => (
@@ -284,11 +284,11 @@ export default function SessionDetailPage() {
                         >
                           <img
                             src={imgPath}
-                            alt={`Original Stitched ${idx + 1}`}
+                            alt={`Stitched Original ${idx + 1}`}
                             className="w-full h-auto"
                           />
                           <div className="bg-gray-700 p-2 text-sm">
-                            Group {idx + 1}
+                            Grup {idx + 1}
                           </div>
                         </div>
                       ))}
@@ -300,7 +300,7 @@ export default function SessionDetailPage() {
                 {outputs.segmented.length > 0 && (
                   <div>
                     <h3 className="text-lg font-semibold mb-3 text-purple-400">
-                      Segmented Version ({outputs.segmented.length} images)
+                      Versi Segmentasi ({outputs.segmented.length} images)
                     </h3>
                     <div className="space-y-4">
                       {outputs.segmented.map((imgPath, idx) => (
@@ -314,11 +314,11 @@ export default function SessionDetailPage() {
                         >
                           <img
                             src={imgPath}
-                            alt={`Segmented Stitched ${idx + 1}`}
+                            alt={`Stitched Segmentasi ${idx + 1}`}
                             className="w-full h-auto"
                           />
                           <div className="bg-gray-700 p-2 text-sm">
-                            Group {idx + 1}
+                            Grup {idx + 1}
                           </div>
                         </div>
                       ))}
@@ -334,12 +334,12 @@ export default function SessionDetailPage() {
                   className="px-8 py-4 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-lg transition-colors flex items-center gap-3"
                 >
                   <span>🎮</span>
-                  Open WebGL Viewer ({selectedVersion === 'original' ? 'Original' : 'Segmented'})
+                  Buka Viewer WebGL ({selectedVersion === 'original' ? 'Original' : 'Segmentasi'})
                 </button>
               </div>
 
               <p className="text-center text-gray-400 text-sm mt-4">
-                You can toggle between versions inside the viewer.
+                Anda dapat berganti versi di dalam viewer.
               </p>
             </div>
           )}
