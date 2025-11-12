@@ -56,13 +56,21 @@ export default function Home() {
                   Sessions detected in <code className="bg-gray-700 px-2 py-1 rounded">public/source/</code>
                 </p>
               </div>
-              <button
-                onClick={fetchSessions}
-                disabled={loading}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg font-semibold transition-colors"
-              >
-                {loading ? 'Loading...' : 'Refresh Sessions'}
-              </button>
+              <div className="flex gap-3">
+                <Link
+                  href="/azure"
+                  className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors"
+                >
+                  ☁️ Download from Azure
+                </Link>
+                <button
+                  onClick={fetchSessions}
+                  disabled={loading}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-lg font-semibold transition-colors"
+                >
+                  {loading ? 'Loading...' : 'Refresh Sessions'}
+                </button>
+              </div>
             </div>
 
             {/* Loading Status */}
