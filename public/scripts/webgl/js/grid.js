@@ -40,8 +40,10 @@ class Grid {
     }
 
     static setupGridBuffers(gl) {
-        const gridVertices = this.createGridGeometry(20, 20); // 20x20 grid
-        const axisVertices = this.createAxisGeometry(10);     // 10 unit axes
+        // Increased grid size to 50x50 with 50 divisions for full, complete squares
+        // Each square will be 1 unit (50/50 = 1), covering a larger area
+        const gridVertices = this.createGridGeometry(50, 50); // 50x50 grid with 50 divisions
+        const axisVertices = this.createAxisGeometry(15);     // 15 unit axes (increased for visibility)
 
         const gridBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, gridBuffer);

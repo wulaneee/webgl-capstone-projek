@@ -56,6 +56,13 @@ const Config = {
             rotation = result.rotation;
             startCoord = result.startCoord;
             endCoord = result.endCoord;
+        } else if (wallCount === 2) {
+            // CORNER LAYOUT (for 2 walls forming an L-shape, both facing inward)
+            const result = this.calculateCornerLayout(groupId, width, height, allTextureData, pixelToWebGLScale);
+            position = result.position;
+            rotation = result.rotation;
+            startCoord = result.startCoord;
+            endCoord = result.endCoord;
         } else {
             // LINEAR ROW LAYOUT (for any other count)
             const result = this.calculateLinearLayout(groupId, width, height, allTextureData, pixelToWebGLScale);
@@ -77,7 +84,16 @@ const Config = {
             console.log(`Wall START coordinate: [${startCoord.join(', ')}]`);
             console.log(`Wall END coordinate: [${endCoord.join(', ')}]`);
             console.log(`Wall rotation: [${rotation.map(r => (r * 180 / Math.PI).toFixed(1)).join(', ')}]° (YXZ)`);
-            console.log(`Layout mode: ${wallCount === 4 ? 'Rectangular Room' : 'Linear Row'}`);
+
+            let layoutMode;
+            if (wallCount === 4) {
+                layoutMode = 'Rectangular Room (4 walls)';
+            } else if (wallCount === 2) {
+                layoutMode = 'Corner L-Shape (2 walls, both facing inward)';
+            } else {
+                layoutMode = 'Linear Row';
+            }
+            console.log(`Layout mode: ${layoutMode}`);
             console.log('========================');
             this.loggedWalls.add(groupId);
         }
@@ -131,6 +147,42 @@ const Config = {
             endCoord = [firstWallWidth - thirdWallWidth, 0, secondWallWidth - width];
         } else {
             // Fallback for groupId > 4 in rectangular mode
+            position = [0, 0, 0];
+            rotation = [0, 0, 0];
+            startCoord = [0, 0, 0];
+            endCoord = [0, 0, 0];
+        }
+
+        return { position, rotation, startCoord, endCoord };
+    },
+
+    /**
+     * Calculate position and rotation for corner layout (2 walls forming L-shape)
+     * Both walls face inward towards the viewer
+     * Wall 1: Starts at origin, extends along X-axis, faces towards negative Z (inward)
+     * Wall 2: Perpendicular to wall 1, extends along negative Z-axis, faces towards negative X (inward)
+     */
+    calculateCornerLayout(groupId, width, height, allTextureData, pixelToWebGLScale) {
+        const firstWall = allTextureData.find(tex => tex.id === 1);
+        const firstWallWidth = firstWall ? firstWall.width * pixelToWebGLScale : 0;
+
+        let position, rotation, startCoord, endCoord;
+
+        if (groupId === 1) {
+            // FIRST WALL: Along X-axis, facing towards negative Z (into the corner)
+            position = [width/2, 0, 0];
+            rotation = [0, 0, 0]; // Face forward (towards -Z)
+            startCoord = [0, 0, 0];
+            endCoord = [width, 0, 0];
+        } else if (groupId === 2) {
+            // SECOND WALL: Perpendicular to first, extending along negative Z-axis
+            // Positioned at the END of first wall, facing towards negative X (into the corner)
+            position = [firstWallWidth, 0, -width/2];
+            rotation = [0, -Math.PI/2, 0]; // Rotate -90° to face left (towards -X)
+            startCoord = [firstWallWidth, 0, 0];
+            endCoord = [firstWallWidth, 0, -width];
+        } else {
+            // Fallback for unexpected groupId
             position = [0, 0, 0];
             rotation = [0, 0, 0];
             startCoord = [0, 0, 0];
