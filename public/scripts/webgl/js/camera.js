@@ -200,12 +200,22 @@ class Camera {
         // Rotation controls (left mouse)
         this.yaw = 0;
         this.pitch = 0;
-        this.rotationSensitivity = 0.003;
+        this.targetYaw = 0;
+        this.targetPitch = 0;
+        this.rotationSensitivity = 0.005; // Increased for more responsive feel
+        this.rotationDamping = 0.25; // Smooth interpolation factor (0-1, higher = faster)
 
         // Pan controls (middle mouse)
         this.panSensitivity = 0.02;
         this.zoomSensitivity = 0.1;
         this.zoomDistance = 5;
+        this.targetZoomDistance = 5;
+        this.zoomDamping = 0.2; // Smooth zoom interpolation
+
+        // Momentum
+        this.velocityYaw = 0;
+        this.velocityPitch = 0;
+        this.momentumDecay = 0.9; // How fast momentum decays (0-1, closer to 1 = longer momentum)
 
         this.viewMatrix = new Matrix4();
         this.projectionMatrix = new Matrix4();
@@ -245,11 +255,16 @@ class Camera {
 
         if (this.isLeftDragging) {
             // Left mouse: Rotate camera around target (orbital controls)
-            this.yaw += deltaX * this.rotationSensitivity;
-            this.pitch -= deltaY * this.rotationSensitivity;
+            // Update target rotation values for smooth interpolation
+            this.targetYaw += deltaX * this.rotationSensitivity;
+            this.targetPitch -= deltaY * this.rotationSensitivity;
+
+            // Store velocity for momentum
+            this.velocityYaw = deltaX * this.rotationSensitivity;
+            this.velocityPitch = -deltaY * this.rotationSensitivity;
 
             // Limit pitch to prevent flipping
-            this.pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.pitch));
+            this.targetPitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.targetPitch));
 
         } else if (this.isMiddleDragging) {
             // Middle mouse: Pan the target point (like Figma)
@@ -281,8 +296,6 @@ class Camera {
 
         this.lastMouseX = event.clientX;
         this.lastMouseY = event.clientY;
-
-        this.updateCameraPosition();
     }
 
     onMouseUp(event) {
@@ -296,11 +309,9 @@ class Camera {
     onWheel(event) {
         event.preventDefault();
 
-        // Zoom in/out by changing distance from target
-        this.zoomDistance += event.deltaY * this.zoomSensitivity;
-        this.zoomDistance = Math.max(0.5, Math.min(50, this.zoomDistance)); // Limit zoom range
-
-        this.updateCameraPosition();
+        // Zoom in/out by changing distance from target (smooth)
+        this.targetZoomDistance += event.deltaY * this.zoomSensitivity;
+        this.targetZoomDistance = Math.max(0.5, Math.min(50, this.targetZoomDistance)); // Limit zoom range
     }
 
     onTouchStart(event) {
@@ -319,20 +330,53 @@ class Camera {
         const deltaX = event.touches[0].clientX - this.lastMouseX;
         const deltaY = event.touches[0].clientY - this.lastMouseY;
 
-        // Touch uses rotation controls like left mouse
-        this.yaw += deltaX * this.rotationSensitivity;
-        this.pitch -= deltaY * this.rotationSensitivity;
+        // Touch uses rotation controls like left mouse (with smooth interpolation)
+        this.targetYaw += deltaX * this.rotationSensitivity;
+        this.targetPitch -= deltaY * this.rotationSensitivity;
 
-        this.pitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.pitch));
+        // Store velocity for momentum
+        this.velocityYaw = deltaX * this.rotationSensitivity;
+        this.velocityPitch = -deltaY * this.rotationSensitivity;
+
+        this.targetPitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.targetPitch));
 
         this.lastMouseX = event.touches[0].clientX;
         this.lastMouseY = event.touches[0].clientY;
-
-        this.updateCameraPosition();
     }
 
     onTouchEnd() {
         this.isLeftDragging = false;
+    }
+
+    /**
+     * Smooth update called every frame for interpolation and momentum
+     * This creates the smooth, game-like camera movement
+     */
+    smoothUpdate() {
+        // Apply momentum when not dragging
+        if (!this.isLeftDragging) {
+            this.targetYaw += this.velocityYaw;
+            this.targetPitch += this.velocityPitch;
+
+            // Decay momentum over time
+            this.velocityYaw *= this.momentumDecay;
+            this.velocityPitch *= this.momentumDecay;
+
+            // Stop momentum when velocity is very small
+            if (Math.abs(this.velocityYaw) < 0.0001) this.velocityYaw = 0;
+            if (Math.abs(this.velocityPitch) < 0.0001) this.velocityPitch = 0;
+
+            // Clamp pitch with momentum
+            this.targetPitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.targetPitch));
+        }
+
+        // Smooth interpolation towards target values (damping)
+        this.yaw += (this.targetYaw - this.yaw) * this.rotationDamping;
+        this.pitch += (this.targetPitch - this.pitch) * this.rotationDamping;
+        this.zoomDistance += (this.targetZoomDistance - this.zoomDistance) * this.zoomDamping;
+
+        // Update camera position based on smoothed values
+        this.updateCameraPosition();
     }
 
     updateCameraPosition() {

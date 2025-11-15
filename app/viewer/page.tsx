@@ -222,12 +222,12 @@ export default function ViewerPage() {
         <div className="absolute top-5 left-5 right-5 flex justify-between items-start pointer-events-auto">
           {/* Left Panel - Info */}
           <div className="bg-black/70 backdrop-blur-lg p-4 rounded-lg">
-            <h3 className="text-green-500 font-bold mb-2">WebGL Panorama Viewer</h3>
+            <h3 className="text-green-500 font-bold mb-2">Penampil Panorama WebGL</h3>
             <div className="text-white text-sm space-y-1">
-              <div>Session: <span className="text-blue-400">{sessionId}</span></div>
-              <div>Version: <span className="text-purple-400">{currentVersion}</span></div>
+              <div>Sesi: <span className="text-blue-400">{sessionId}</span></div>
+              <div>Versi: <span className="text-purple-400">{currentVersion}</span></div>
               <div>
-                {webglLoading ? 'Loading images...' : `${imageCount} panorama images loaded`}
+                {webglLoading ? 'Memuat gambar...' : `${imageCount} gambar panorama dimuat`}
               </div>
             </div>
           </div>
@@ -239,20 +239,20 @@ export default function ViewerPage() {
               disabled={webglLoading}
               className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white px-5 py-2 rounded transition-colors mb-2"
             >
-              {webglLoading ? 'Switching...' : `Switch to ${currentVersion === 'original' ? 'Segmented' : 'Original'}`}
+              {webglLoading ? 'Mengalihkan...' : `Ganti ke ${currentVersion === 'original' ? 'Segmented' : 'Original'}`}
             </button>
 
             <button
               onClick={() => router.push(`/session/${sessionId}`)}
               className="w-full bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded transition-colors"
             >
-              Back to Session
+              Kembali ke Sesi
             </button>
 
             {webglLoading && (
               <div className="text-green-500 font-bold flex items-center justify-end gap-2 mt-2">
                 <div className="animate-spin h-4 w-4 border-2 border-green-500 border-t-transparent rounded-full"></div>
-                Initializing WebGL...
+                Menginisialisasi WebGL...
               </div>
             )}
 
@@ -264,7 +264,7 @@ export default function ViewerPage() {
 
         {/* Bottom Instructions */}
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-lg px-6 py-3 rounded-full text-gray-300 text-sm pointer-events-none">
-          🖱️ Left: Rotate • 🖱️ Middle: Pan • 🔄 Scroll: Zoom
+          🖱️ Kiri: Rotasi • 🖱️ Tengah: Geser • 🔄 Scroll: Zoom
         </div>
       </div>
     </div>

@@ -191,6 +191,9 @@ class Renderer {
     render() {
         if (!this.isRunning) return;
 
+        // Update camera with smooth interpolation and momentum (game-like feel)
+        this.camera.smoothUpdate();
+
         this.setupViewport();
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);

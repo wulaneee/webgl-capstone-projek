@@ -1,87 +1,81 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Session, StitchingVersion } from '@/lib/types'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
+// API Functions
+const fetchSessionDetails = async (sessionId: string) => {
+  const response = await fetch(`/api/sessions/${sessionId}`)
+  const data = await response.json()
+
+  if (!data.success) {
+    throw new Error(data.message || 'Failed to fetch session details')
+  }
+
+  return {
+    session: data.session as Session,
+    outputs: data.outputs as { original: string[]; segmented: string[] } | null
+  }
+}
+
+const processStitching = async (sessionId: string) => {
+  const response = await fetch(`/api/sessions/${sessionId}/stitch`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  const data = await response.json()
+
+  if (!data.success) {
+    throw new Error(data.message || 'Stitching failed')
+  }
+
+  return data
+}
 
 export default function SessionDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const sessionId = params.sessionId as string
-
-  const [session, setSession] = useState<Session | null>(null)
-  const [outputs, setOutputs] = useState<{ original: string[]; segmented: string[] } | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  // Stitching states
-  const [stitching, setStitching] = useState(false)
-  const [stitchingProgress, setStitchingProgress] = useState('')
-  const [stitchingError, setStitchingError] = useState('')
 
   // Version selection
   const [selectedVersion, setSelectedVersion] = useState<StitchingVersion>('original')
 
-  // Fetch session details
-  useEffect(() => {
-    fetchSessionDetails()
-  }, [sessionId])
+  // Query untuk fetch session details dengan caching
+  const {
+    data,
+    isLoading: loading,
+    error,
+    refetch: refetchSession
+  } = useQuery({
+    queryKey: ['session-detail', sessionId],
+    queryFn: () => fetchSessionDetails(sessionId),
+    staleTime: 3 * 60 * 1000, // Data fresh selama 3 menit
+    gcTime: 10 * 60 * 1000, // Cache disimpan 10 menit
+  })
 
-  const fetchSessionDetails = async () => {
-    try {
-      setLoading(true)
-      setError('')
+  const session = data?.session
+  const outputs = data?.outputs
 
-      const response = await fetch(`/api/sessions/${sessionId}`)
-      const data = await response.json()
-
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to fetch session details')
-      }
-
-      setSession(data.session)
-      setOutputs(data.outputs)
-      setLoading(false)
-    } catch (err) {
-      console.error('Failed to fetch session details:', err)
-      setError((err as Error).message || 'Failed to fetch session details')
-      setLoading(false)
-    }
-  }
-
-  const handleProcessStitching = async () => {
-    try {
-      setStitching(true)
-      setStitchingProgress('Starting stitching process...')
-      setStitchingError('')
-
-      const response = await fetch(`/api/sessions/${sessionId}/stitch`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      const data = await response.json()
-
-      if (!data.success) {
-        throw new Error(data.message || 'Stitching failed')
-      }
-
-      setStitchingProgress('Stitching completed successfully!')
-
-      // Refresh session data to show outputs
+  // Mutation untuk stitching
+  const stitchingMutation = useMutation({
+    mutationFn: () => processStitching(sessionId),
+    onSuccess: () => {
+      // Invalidate dan refetch session data setelah stitching berhasil
       setTimeout(() => {
-        fetchSessionDetails()
-        setStitching(false)
-        setStitchingProgress('')
+        queryClient.invalidateQueries({ queryKey: ['session-detail', sessionId] })
       }, 1000)
-    } catch (err) {
-      console.error('Stitching error:', err)
-      setStitchingError((err as Error).message || 'Stitching failed')
-      setStitching(false)
-    }
+    },
+  })
+
+  const handleProcessStitching = () => {
+    stitchingMutation.mutate()
   }
 
   const openWebGLViewer = () => {
@@ -106,7 +100,7 @@ export default function SessionDetailPage() {
         <div className="text-center">
           <div className="text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold mb-2">Sesi Tidak Ditemukan</h2>
-          <p className="text-gray-400 mb-6">{error}</p>
+          <p className="text-gray-400 mb-6">{(error as Error)?.message}</p>
           <Link
             href="/"
             className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold inline-block"
@@ -156,10 +150,10 @@ export default function SessionDetailPage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={handleProcessStitching}
-                disabled={session.status.hasOutput || stitching}
+                disabled={session.status.hasOutput || stitchingMutation.isPending}
                 className="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-semibold transition-colors"
               >
-                {stitching ? 'Memproses...' : 'Proses Stitching'}
+                {stitchingMutation.isPending ? 'Memproses...' : 'Proses Stitching'}
               </button>
 
               {session.status.hasOutput && (
@@ -170,19 +164,25 @@ export default function SessionDetailPage() {
             </div>
 
             {/* Progress Messages */}
-            {stitching && (
+            {stitchingMutation.isPending && (
               <div className="mt-4 p-4 bg-blue-900/30 border border-blue-600 rounded text-blue-300">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="animate-spin h-4 w-4 border-2 border-blue-400 border-t-transparent rounded-full"></div>
                   Processing...
                 </div>
-                <div className="text-sm">{stitchingProgress}</div>
+                <div className="text-sm">Starting stitching process...</div>
               </div>
             )}
 
-            {stitchingError && (
+            {stitchingMutation.isSuccess && (
+              <div className="mt-4 p-4 bg-green-900/30 border border-green-600 rounded text-green-300">
+                <strong>✓ Success:</strong> Stitching completed successfully!
+              </div>
+            )}
+
+            {stitchingMutation.isError && (
               <div className="mt-4 p-4 bg-red-900/30 border border-red-600 rounded text-red-300">
-                <strong>Error:</strong> {stitchingError}
+                <strong>Error:</strong> {(stitchingMutation.error as Error)?.message || 'Stitching failed'}
               </div>
             )}
           </div>
