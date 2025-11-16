@@ -8,6 +8,16 @@ import Session from '@/lib/models/Session';
  */
 export async function GET() {
   try {
+    // Check if MongoDB URI is configured
+    if (!process.env.MONGODB_URI) {
+      return NextResponse.json({
+        success: false,
+        message: 'MongoDB URI not configured. Please set MONGODB_URI environment variable.',
+        sessions: [],
+        count: 0,
+      });
+    }
+
     await connectDB();
 
     const sessions = await Session.find({ status: 'completed' })
@@ -32,6 +42,8 @@ export async function GET() {
         success: false,
         message: 'Failed to fetch sessions from database',
         error: error instanceof Error ? error.message : 'Unknown error',
+        sessions: [],
+        count: 0,
       },
       { status: 500 }
     );

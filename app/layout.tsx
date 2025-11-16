@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Montserrat } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/lib/query-provider";
+import Navbar from "@/components/Navbar";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +39,14 @@ export default function RootLayout({
         style={{ fontFamily: 'var(--font-montserrat), system-ui, sans-serif' }}
       >
         <QueryProvider>
-          {children}
+          <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+            <Navbar />
+            <Breadcrumbs />
+            <main className="pt-16 flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </QueryProvider>
       </body>
     </html>
