@@ -1,8 +1,0 @@
-graph matches_graph{
-"002.png" -- "003.png"[label="Nm=96, Ni=96, C=2.6087"];
-"004.png" -- "005.png"[label="Nm=171, Ni=171, C=2.88364"];
-"005.png" -- "006.png"[label="Nm=211, Ni=207, C=2.90323"];
-"006.png" -- "007.png"[label="Nm=78, Ni=76, C=2.42038"];
-"001.png";
-"008.png";
-}

@@ -1,1 +1,0 @@
-Stitcher(**{'detector': 'sift', 'confidence_threshold': 0.3, 'nfeatures': 1000})
