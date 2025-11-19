@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Session } from '@/lib/types'
-import { CloudDownload } from 'lucide-react';
+import { CloudDownload } from 'lucide-react'
+import PageWrapper from '@/components/PageWrapper';
 
 const folderStructure = `public/source/
   └── session_01/
@@ -48,8 +49,9 @@ export default function Home() {
   }
 
   return (
-    <div className="p-8 mb-16">
-      <div className="max-w-7xl mx-auto">
+    <PageWrapper>
+      <div className="p-8 mb-16">
+        <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-3">
@@ -208,7 +210,8 @@ export default function Home() {
             belum diproses
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </PageWrapper>
   )
 }

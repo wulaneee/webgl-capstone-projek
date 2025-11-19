@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Session, StitchingVersion } from '@/lib/types'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import PageWrapper from '@/components/PageWrapper'
 
 // API Functions
 const fetchSessionDetails = async (sessionId: string) => {
@@ -85,35 +86,39 @@ export default function SessionDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin h-12 w-12 border-4 border-blue-400 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <div className="text-xl">Loading session...</div>
+      <PageWrapper>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin h-12 w-12 border-4 border-blue-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="text-xl">Loading session...</div>
+          </div>
         </div>
-      </div>
+      </PageWrapper>
     )
   }
 
   if (error || !session) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold mb-2">Sesi Tidak Ditemukan</h2>
-          <p className="text-gray-400 mb-6">{(error as Error)?.message}</p>
-          <Link
-            href="/"
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold inline-block"
-          >
-            Kembali ke Beranda
-          </Link>
+      <PageWrapper>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h2 className="text-2xl font-bold mb-2">Sesi Tidak Ditemukan</h2>
+            <p className="text-gray-400 mb-6">{(error as Error)?.message}</p>
+            <Link
+              href="/"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold inline-block"
+            >
+              Kembali ke Beranda
+            </Link>
+          </div>
         </div>
-      </div>
+      </PageWrapper>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <PageWrapper>
       <div className="p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header with Back Button */}
@@ -345,6 +350,6 @@ export default function SessionDetailPage() {
           )}
         </div>
       </div>
-    </div>
+    </PageWrapper>
   )
 }

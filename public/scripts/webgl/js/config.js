@@ -123,31 +123,31 @@ const Config = {
 
         if (groupId === 1) {
             // FIRST WALL: Start at origin
-            position = [width/2, 0, 0];
+            position = [width/2, height/2, 0];
             rotation = [0, 0, 0];
             startCoord = [0, 0, 0];
             endCoord = [width, 0, 0];
         } else if (groupId === 2) {
             // SECOND WALL: Perpendicular to first
-            position = [firstWallWidth, 0, width/2];
+            position = [firstWallWidth, height/2, width/2];
             rotation = [0, Math.PI/2, 0];
             startCoord = [firstWallWidth, 0, 0];
             endCoord = [firstWallWidth, 0, width];
         } else if (groupId === 3) {
             // THIRD WALL: Opposite to first
-            position = [firstWallWidth - width/2, 0, secondWallWidth];
+            position = [firstWallWidth - width/2, height/2, secondWallWidth];
             rotation = [0, Math.PI, 0];
             startCoord = [firstWallWidth, 0, secondWallWidth];
             endCoord = [firstWallWidth - width, 0, secondWallWidth];
         } else if (groupId === 4) {
             // FOURTH WALL: Closes the rectangle
-            position = [firstWallWidth - thirdWallWidth, 0, secondWallWidth - width/2];
+            position = [firstWallWidth - thirdWallWidth, height/2, secondWallWidth - width/2];
             rotation = [0, -Math.PI/2, 0];
             startCoord = [firstWallWidth - thirdWallWidth, 0, secondWallWidth];
             endCoord = [firstWallWidth - thirdWallWidth, 0, secondWallWidth - width];
         } else {
             // Fallback for groupId > 4 in rectangular mode
-            position = [0, 0, 0];
+            position = [0, height/2, 0];
             rotation = [0, 0, 0];
             startCoord = [0, 0, 0];
             endCoord = [0, 0, 0];
@@ -170,20 +170,20 @@ const Config = {
 
         if (groupId === 1) {
             // FIRST WALL: Along X-axis, facing towards negative Z (into the corner)
-            position = [width/2, 0, 0];
+            position = [width/2, height/2, 0];
             rotation = [0, 0, 0]; // Face forward (towards -Z)
             startCoord = [0, 0, 0];
             endCoord = [width, 0, 0];
         } else if (groupId === 2) {
             // SECOND WALL: Perpendicular to first, extending along negative Z-axis
             // Positioned at the END of first wall, facing towards negative X (into the corner)
-            position = [firstWallWidth, 0, -width/2];
+            position = [firstWallWidth, height/2, -width/2];
             rotation = [0, -Math.PI/2, 0]; // Rotate -90° to face left (towards -X)
             startCoord = [firstWallWidth, 0, 0];
             endCoord = [firstWallWidth, 0, -width];
         } else {
             // Fallback for unexpected groupId
-            position = [0, 0, 0];
+            position = [0, height/2, 0];
             rotation = [0, 0, 0];
             startCoord = [0, 0, 0];
             endCoord = [0, 0, 0];
@@ -209,7 +209,7 @@ const Config = {
         }
 
         // Position wall center at xOffset + half its width
-        const position = [xOffset + width/2, 0, 0];
+        const position = [xOffset + width/2, height/2, 0];
         const rotation = [0, 0, 0]; // All walls face forward
         const startCoord = [xOffset, 0, 0];
         const endCoord = [xOffset + width, 0, 0];
