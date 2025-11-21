@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import PageWrapper from '@/components/PageWrapper'
 
 interface FAQItem {
   question: string
@@ -130,8 +131,9 @@ export default function HelpPage() {
     : faqData.filter(item => item.category === activeCategory)
 
   return (
-    <div className="p-6">
-      <div className="max-w-7xl mx-auto">
+    <PageWrapper>
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Pusat Bantuan</h1>
@@ -253,7 +255,8 @@ export default function HelpPage() {
           </div>
         </div>
 
+        </div>
       </div>
-    </div>
+    </PageWrapper>
   )
 }

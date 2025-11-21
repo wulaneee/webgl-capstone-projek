@@ -7,6 +7,7 @@ import path from 'path';
 
 /**
  * Copy session data from public/source to unified_script directory
+ * Always overwrites existing files to ensure data consistency
  */
 function copySessionToUnifiedScript(sessionId: string): void {
   const sourceSessionPath = getSessionPath(sessionId);
@@ -31,10 +32,11 @@ function copySessionToUnifiedScript(sessionId: string): void {
       const sourcePath = path.join(sourceImages, file);
       const destPath = path.join(destImages, file);
 
-      // Only copy if file doesn't exist or is different
-      if (!fs.existsSync(destPath)) {
-        fs.copyFileSync(sourcePath, destPath);
+      // Always overwrite - delete existing file first, then copy
+      if (fs.existsSync(destPath)) {
+        fs.unlinkSync(destPath);
       }
+      fs.copyFileSync(sourcePath, destPath);
     });
   }
 
@@ -52,12 +54,52 @@ function copySessionToUnifiedScript(sessionId: string): void {
       const sourcePath = path.join(sourceMetadatas, file);
       const destPath = path.join(destMetadatas, file);
 
-      // Only copy if file doesn't exist or is different
-      if (!fs.existsSync(destPath)) {
-        fs.copyFileSync(sourcePath, destPath);
+      // Always overwrite - delete existing file first, then copy
+      if (fs.existsSync(destPath)) {
+        fs.unlinkSync(destPath);
       }
+      fs.copyFileSync(sourcePath, destPath);
     });
   }
+
+  // Clean up orphaned metadata files
+  cleanupOrphanedMetadata(unifiedScriptPath);
+}
+
+/**
+ * Clean up orphaned metadata files in unified_script that don't have corresponding images
+ */
+function cleanupOrphanedMetadata(unifiedScriptPath: string): void {
+  const imagesDir = path.join(unifiedScriptPath, 'images');
+  const metadatasDir = path.join(unifiedScriptPath, 'metadatas');
+
+  if (!fs.existsSync(imagesDir) || !fs.existsSync(metadatasDir)) {
+    return;
+  }
+
+  // Get list of image files (without extension)
+  const imageFiles = fs.readdirSync(imagesDir)
+    .filter(file => file.match(/\.(jpg|jpeg|png|bmp|tiff)$/i))
+    .map(file => path.parse(file).name);
+
+  // Get list of metadata files (without extension)
+  const metadataFiles = fs.readdirSync(metadatasDir)
+    .filter(file => file.endsWith('.json'))
+    .map(file => path.parse(file).name);
+
+  // Find metadata files that don't have corresponding images
+  const orphanedMetadata = metadataFiles.filter(metadataId => !imageFiles.includes(metadataId));
+
+  // Remove orphaned metadata files
+  orphanedMetadata.forEach(metadataId => {
+    const metadataPath = path.join(metadatasDir, `${metadataId}.json`);
+    try {
+      fs.unlinkSync(metadataPath);
+      console.log(`Cleaned up orphaned metadata: ${metadataId}.json`);
+    } catch (error) {
+      console.error(`Failed to remove orphaned metadata ${metadataId}.json:`, error);
+    }
+  });
 }
 
 /**

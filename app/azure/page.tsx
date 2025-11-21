@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import PageWrapper from '@/components/PageWrapper';
 
 interface AzureSession {
   sessionId: string;
@@ -166,38 +167,43 @@ export default function AzureSessionsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">Memuat sesi dari database...</p>
+      <PageWrapper>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-gray-400">Memuat sesi dari database...</p>
+          </div>
         </div>
-      </div>
+      </PageWrapper>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-red-900/20 border border-red-500 rounded-lg p-6 max-w-md">
-          <h2 className="text-red-500 text-xl font-bold mb-2">Error</h2>
-          <p className="text-gray-300 mb-4">{(error as Error).message}</p>
-          <p className="text-gray-400 text-sm mb-4">
-            Pastikan MongoDB telah dikonfigurasi dengan benar di environment variable MONGODB_URI.
-          </p>
-          <button
-            onClick={() => refetchSessions()}
-            className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
-          >
-            Coba Lagi
-          </button>
+      <PageWrapper>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="bg-red-900/20 border border-red-500 rounded-lg p-6 max-w-md">
+            <h2 className="text-red-500 text-xl font-bold mb-2">Error</h2>
+            <p className="text-gray-300 mb-4">{(error as Error).message}</p>
+            <p className="text-gray-400 text-sm mb-4">
+              Pastikan MongoDB telah dikonfigurasi dengan benar di environment variable MONGODB_URI.
+            </p>
+            <button
+              onClick={() => refetchSessions()}
+              className="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+            >
+              Coba Lagi
+            </button>
+          </div>
         </div>
-      </div>
+      </PageWrapper>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="max-w-7xl mx-auto">
+    <PageWrapper>
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Sesi Azure</h1>
@@ -367,7 +373,8 @@ export default function AzureSessionsPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
